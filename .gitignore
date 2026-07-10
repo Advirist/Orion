@@ -6,6 +6,8 @@ __pycache__/
 # My files
 history.json
 playground/
+config.py
+prompts.py
 
 # C extensions
 *.so
