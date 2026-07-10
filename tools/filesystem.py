@@ -2,6 +2,58 @@ import os
 from pathlib import Path
 from config import TESTING_DIR
 
+#Schema to define tools to assistant
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "list_directory",
+            "description": "Lists directory contents within the user's sandboxed playground directory (a restricted testing folder used during development). Attempts to access paths outside the playground will be rejected with an error.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path" : {
+                        "type" : "string",
+                        "description" : "The directory path to list, relative to the playground root. Defaults to the current directory '.' if not specified by the user. Absolute paths are not allowed."
+                    }
+                },
+                "required": []
+            }
+        }
+    },
+    {
+    "type": "function",
+    "function": {
+            "name": "read_file",
+            "description": "Reads the text contents of a file within the user's sandboxed playground directory, starting at a given character offset. If the file is larger than what's returned, the result will indicate more content remains — call again with a larger offset to continue reading. Absolute paths are not allowed.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "The file path to read, relative to the playground root."
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "description": "The character position to start reading from. Defaults to 0 (start of file)."
+                    },
+                    "max_char": {
+                        "type": "integer",
+                        "description": "Maximum number of characters to return in this read. Defaults to 12000."
+                    }
+                },
+                "required": ["path"]
+            }
+        }
+    }
+]
+
+TOOL_REGISTRY = {
+    "list_directory": {'function' : list_directory, 'mutating' : False},
+    "read_file" : {'function' : read_file, 'mutating' : False},
+    
+    }
+
 #Tool to list directorys
 def list_directory(path = '.'):
     #checks for absolute path if it is sends an error becasue absolute paths arent allowed
@@ -58,10 +110,11 @@ def list_directory(path = '.'):
             "message": f"Permission denied when trying to read '{path}'."
         }
 
+#Tool to read files
 def read_file(path : str, offset : int = 0, max_char : int = 12000):
     
 
-
+    #makes sure path isnt absolute
     if Path(path).is_absolute():
         return {
             "success": False,
@@ -73,6 +126,7 @@ def read_file(path : str, offset : int = 0, max_char : int = 12000):
     combined_path = TESTING_DIR / relative_path
     resolved_path = combined_path.resolve()
 
+    #makes sure path is in playground directory
     if not resolved_path.is_relative_to(TESTING_DIR):
         return {
             "success": False,
@@ -96,15 +150,18 @@ def read_file(path : str, offset : int = 0, max_char : int = 12000):
             "message": f"'{path}' is a directory, not a file. Use a file path to read its contents."
         }
     
+    #first check to make sure file is actually readable
     ALLOWED_EXTENSIONS = {'.txt', '.py', '.md', '.json', '.csv', '.java'}
     if resolved_path.suffix not in ALLOWED_EXTENSIONS:
         return {"success": False, "error": "unsupported_file_type", "message": f"'{path}' has an unsupported file type. Allowed types: {', '.join(sorted(ALLOWED_EXTENSIONS))}"}
 
+    #second check just inscase any unreadble text is in accepted file formats
     try:
         file_contents = resolved_path.read_text(encoding='utf-8')
     except UnicodeDecodeError:
         return {"success": False, "error": "not_text_file", "message": f"'{path}' does not appear to be a text file and cannot be read."}
 
+    #loads files in chunks and allows assistant to get more if needed
     file_chunk = file_contents[offset:offset + max_char]
     if len(file_contents) - offset > len(file_chunk):
         return {
@@ -118,54 +175,3 @@ def read_file(path : str, offset : int = 0, max_char : int = 12000):
         }
     
 
-#Schema to define tools to assistant
-TOOLS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "list_directory",
-            "description": "Lists directory contents within the user's sandboxed playground directory (a restricted testing folder used during development). Attempts to access paths outside the playground will be rejected with an error.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path" : {
-                        "type" : "string",
-                        "description" : "The directory path to list, relative to the playground root. Defaults to the current directory '.' if not specified by the user. Absolute paths are not allowed."
-                    }
-                },
-                "required": []
-            }
-        }
-    },
-    {
-    "type": "function",
-    "function": {
-            "name": "read_file",
-            "description": "Reads the text contents of a file within the user's sandboxed playground directory, starting at a given character offset. If the file is larger than what's returned, the result will indicate more content remains — call again with a larger offset to continue reading. Absolute paths are not allowed.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "The file path to read, relative to the playground root."
-                    },
-                    "offset": {
-                        "type": "integer",
-                        "description": "The character position to start reading from. Defaults to 0 (start of file)."
-                    },
-                    "max_char": {
-                        "type": "integer",
-                        "description": "Maximum number of characters to return in this read. Defaults to 12000."
-                    }
-                },
-                "required": ["path"]
-            }
-        }
-    }
-]
-
-TOOL_REGISTRY = {
-    "list_directory": list_directory,
-    "read_file" : read_file,
-
-    }

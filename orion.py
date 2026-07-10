@@ -18,7 +18,7 @@ if isinstance(history, list) and history:
 session_bool = True
 
 #first user input to start session off
-user_in = input('Orion - type /e to end:')
+user_in = input('Orion - type /e to end: ')
 if user_in.strip() == '/e': #ends session if user types /e
         session_bool = False
 #adds first user input to history
@@ -62,7 +62,7 @@ while session_bool:
     history_save(history)
 
     #asks the user for input and adds it to the history
-    user_in = input('\nOrion - type /e to end:')
+    user_in = input('\nOrion - type /e to end: ')
     
     if user_in.strip() == '/e': #ends session if user types /e
         break
