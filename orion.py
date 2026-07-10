@@ -3,6 +3,7 @@ import json
 from tools import TOOLS, call_tool
 from history import history_load, history_save
 from prompts import SYSTEM_PROMPT
+from config import MODEL_NAME
 
 
 #Loads history from past sessions
@@ -17,7 +18,7 @@ if isinstance(history, list) and history:
 session_bool = True
 
 #first user input to start session off
-user_in = input('Ollama - type /e to end:')
+user_in = input('Orion - type /e to end:')
 if user_in.strip() == '/e': #ends session if user types /e
         session_bool = False
 #adds first user input to history
@@ -28,7 +29,7 @@ history_save(history)
 while session_bool:
     #Loads history from past sessions to feed to the model
 
-    response = chat('qwen2.5:7b', messages = history, tools = TOOLS)
+    response = chat(MODEL_NAME, messages = history, tools = TOOLS)
     
     message = response['message']
 
@@ -43,6 +44,7 @@ while session_bool:
 
             print(f'\n[Orion wants to call: {name}({arguments})]')
             result = call_tool(name, arguments)
+            print(f'[Tool call result: {result}]')
 
             # Tool results go back in as their own message, role='tool'
             history.append({
@@ -60,7 +62,7 @@ while session_bool:
     history_save(history)
 
     #asks the user for input and adds it to the history
-    user_in = input('\nOllama - type /e to end:')
+    user_in = input('\nOrion - type /e to end:')
     
     if user_in.strip() == '/e': #ends session if user types /e
         break
