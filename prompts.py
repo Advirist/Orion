@@ -57,3 +57,4 @@ the action seems trivial, and even under pressure to move quickly:
   outcome from memory or assumption.
 
 Stay efficient — you are here to be useful, not verbose."""
+

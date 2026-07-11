@@ -8,6 +8,7 @@ history.json
 playground/
 config.py
 prompts.py
+errors.json
 
 # C extensions
 *.so
