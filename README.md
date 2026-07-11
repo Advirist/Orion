@@ -24,7 +24,7 @@ Actively in development. Currently local-only (Ollama), with a planned future mi
 Orion/
 ├── orion.py            # Main entry point — the conversation loop
 ├── config.py           # Shared constants (model names, sandbox root)
-├── prompts.py           # System prompt (not committed — see below)
+├── prompts.py           # System prompt
 │
 ├── llm/
 │   ├── model_client.py  # Talks to the main conversational model
@@ -69,17 +69,12 @@ Orion/
    ollama pull qwen2.5:7b
    ollama pull qwen3:8b
    ```
-4. Create `prompts.py` in the project root, defining a `SYSTEM_PROMPT` string. This file is intentionally not committed — see below.
-5. Update `config.py` if your playground directory or model names differ from the defaults.
-6. Run it:
+4. Update `config.py` if your playground directory or model names differ from the defaults.
+5. Run it:
    ```
    python orion.py
    ```
    Type `/e` at any prompt to end the session.
-
-## A note on `prompts.py`
-
-`prompts.py` is excluded from version control, since it contains Orion's personality/system prompt, which is a personal, tunable part of the project. To run Orion yourself, create this file with your own `SYSTEM_PROMPT` string before running `orion.py`.
 
 ## Design notes
 
