@@ -5,9 +5,6 @@ __pycache__/
 
 # My files
 history.json
-playground/
-config.py
-prompts.py
 errors.json
 test.py
 
