@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from config import TESTING_DIR
+from settings.config import TESTING_DIR
 
 #Schema to define tools to assistant
 TOOLS = [

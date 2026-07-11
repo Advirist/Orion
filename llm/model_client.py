@@ -1,5 +1,5 @@
 from ollama import chat
-from config import MODEL_NAME
+from settings.config import MODEL_NAME
 from tools import TOOLS
 
 def get_response(history: str):

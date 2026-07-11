@@ -9,6 +9,7 @@ playground/
 config.py
 prompts.py
 errors.json
+test.py
 
 # C extensions
 *.so

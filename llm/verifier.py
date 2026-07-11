@@ -1,4 +1,4 @@
-from config import VERIFIER_MODEL_NAME
+from settings.config import VERIFIER_MODEL_NAME
 from ollama import chat
 
 def lie_detector(tool_results: list, model_response: str) -> tuple[bool, str]:

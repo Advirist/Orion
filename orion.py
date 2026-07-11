@@ -1,12 +1,12 @@
 from ollama import chat
 import json
 from tools import call_tool
-from history import history_load, history_save
-from prompts import SYSTEM_PROMPT
-from model_client import get_response
-from verifier import lie_detector
-from config import MODEL_NAME
-from errors import log_error
+from storage.history import history_load, history_save
+from settings.prompts import SYSTEM_PROMPT
+from llm.model_client import get_response
+from llm.verifier import lie_detector
+from settings.config import MODEL_NAME
+from storage.errors import log_error
 
 #Loads history from past sessions
 history = history_load()
