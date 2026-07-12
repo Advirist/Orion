@@ -6,7 +6,7 @@ from settings.prompts import SYSTEM_PROMPT
 from llm.model_client import get_response
 from llm.verifier import lie_detector
 from settings.config import MODEL_NAME
-from storage.errors import log_error
+from storage.errors import log_error_from_verifier
 
 #Loads history from past sessions
 history = history_load()
@@ -95,7 +95,7 @@ while session_bool:
         if not lie_detector_result:
             print(f'\n[Verifier flagged this response as inaccurate: {lie_detector_reason}]')
             print(f'[Original response: "{full_content}"]')
-            log_error(tool_results_for_lie_detector, full_content, lie_detector_reason)
+            log_error_from_verifier(tool_results_for_lie_detector, full_content, lie_detector_reason)
             full_content = chat(MODEL_NAME, messages=[{'role' : 'system', 'content' : CORRECTION_PROMPT}])['message']['content']
             print(f'[Corrected response: "{full_content}"]')
 

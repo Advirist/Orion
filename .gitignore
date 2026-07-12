@@ -5,8 +5,9 @@ __pycache__/
 
 # My files
 history.json
-errors.json
-test.py
+verifier_errors.json
+subprocess_errors.json
+tests/
 
 # C extensions
 *.so
