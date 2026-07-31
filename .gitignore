@@ -8,6 +8,7 @@ history.json
 verifier_errors.json
 subprocess_errors.json
 tests/
+repl.py
 
 # C extensions
 *.so

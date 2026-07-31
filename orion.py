@@ -7,6 +7,7 @@ from llm.model_client import get_response
 from llm.verifier import lie_detector
 from settings.config import MODEL_NAME
 from storage.errors import log_error_from_verifier
+from voice.voice_io import listen, speak
 
 #Loads history from past sessions
 history = history_load()
@@ -19,9 +20,11 @@ if isinstance(history, list) and history:
 
 session_bool = True
 
-#first user input to start session off
+#first user input to start session off checks if wants to use voice or not
 try:
-    user_in = input('Orion - type /e to end: ')
+    
+    user_in = input("Press Enter to start recording, type to not use voice: ")
+    user_in = listen(user_in)
 except KeyboardInterrupt:
     print("\n[Exiting]")
     session_bool = False
@@ -103,12 +106,14 @@ while session_bool:
 
 
     #prints the response from the model and adds it to the history
+    speak(full_content)
     history.append({'role': 'assistant', 'content': full_content})
     history_save(history)
 
     #asks the user for input and adds it to the history
     try:
-        user_in = input('\nOrion - type /e to end: ')
+        user_in = input("Press Enter to start recording, type to not use voice: ")
+        user_in = listen(user_in)
     except KeyboardInterrupt:
         print("\n[Exiting]")
         break

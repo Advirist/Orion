@@ -46,31 +46,31 @@ TOOLS = [
             }
         }
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "write_file",
-            "description": "Writes text content to a file within the user's sandboxed playground directory. This always replaces the file's entire contents — it does not append. If the target file already exists, the user will be asked to confirm before it is overwritten, and its previous contents will be permanently lost. To add to an existing file rather than replace it, first read the file's current contents, then call this tool with file_content set to the old content plus the new content combined. The target directory must already exist. Absolute paths are not allowed.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "The directory the file should be written into, relative to the playground root. This directory must already exist; use '.' for the playground root itself."
-                    },
-                    "filename": {
-                        "type": "string",
-                        "description": "The name of the file to write, including its extension (e.g. 'notes.txt')."
-                    },
-                    "file_content": {
-                        "type": "string",
-                        "description": "The full text content to write into the file. This replaces anything already in the file — it is not appended. If you want to preserve existing content, include it here along with the new content."
-                    }
-                },
-                "required": ["path", "filename", "file_content"]
-            }
-        }
-    },
+    # {
+    #     "type": "function",
+    #     "function": {
+    #         "name": "write_file",
+    #         "description": "Writes text content to a file within the user's sandboxed playground directory. This always replaces the file's entire contents — it does not append. If the target file already exists, the user will be asked to confirm before it is overwritten, and its previous contents will be permanently lost. To add to an existing file rather than replace it, first read the file's current contents, then call this tool with file_content set to the old content plus the new content combined. The target directory must already exist. Absolute paths are not allowed.",
+    #         "parameters": {
+    #             "type": "object",
+    #             "properties": {
+    #                 "path": {
+    #                     "type": "string",
+    #                     "description": "The directory the file should be written into, relative to the playground root. This directory must already exist; use '.' for the playground root itself."
+    #                 },
+    #                 "filename": {
+    #                     "type": "string",
+    #                     "description": "The name of the file to write, including its extension (e.g. 'notes.txt')."
+    #                 },
+    #                 "file_content": {
+    #                     "type": "string",
+    #                     "description": "The full text content to write into the file. This replaces anything already in the file — it is not appended. If you want to preserve existing content, include it here along with the new content."
+    #                 }
+    #             },
+    #             "required": ["path", "filename", "file_content"]
+    #         }
+    #     }
+    # },
 ]
 
 #Tool to list directories
@@ -300,5 +300,5 @@ def write_file(path: str, filename: str, file_content: str):
 TOOL_REGISTRY = {
     "list_directory": {'function': list_directory, 'mutating': False},
     "read_file": {'function': read_file, 'mutating': False},
-    "write_file": {'function': write_file, 'mutating': False}
+    #"write_file": {'function': write_file, 'mutating': False}
 }
