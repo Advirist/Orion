@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from settings.config import TESTING_DIR
+import fnmatch
+from datetime import datetime, timedelta, timezone
 
 #Schema to define tools to assistant
 TOOLS = [
@@ -71,6 +73,39 @@ TOOLS = [
     #         }
     #     }
     # },
+    {
+    "type": "function",
+    "function": {
+        "name": "search_files",
+        "description": "Recursively searches for files within the user's sandboxed playground directory (including all subfolders), matching any combination of the given criteria. At least one criterion must be provided. This tool only finds files — it does not read or modify their contents.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name_pattern": {
+                    "type": "string",
+                    "description": "A filename to match, either exact (e.g. 'notes.txt') or with wildcards (e.g. '*.py' for all Python files, 'test_*' for names starting with 'test_'). Defaults to matching all files if not specified."
+                },
+                "min_size": {
+                    "type": "integer",
+                    "description": "Minimum file size in bytes. Files smaller than this are excluded. Optional."
+                },
+                "max_size": {
+                    "type": "integer",
+                    "description": "Maximum file size in bytes. Files larger than this are excluded. Optional."
+                },
+                "file_type": {
+                    "type": "string",
+                    "description": "File extension to match, with or without a leading dot (e.g. 'py' or '.py'). Optional."
+                },
+                "modified_within_days": {
+                    "type": "integer",
+                    "description": "Only include files modified within this many days of now (e.g. 7 for the past week). Optional."
+                }
+            },
+            "required": []
+        }
+    }
+},
 ]
 
 #Tool to list directories
@@ -296,9 +331,53 @@ def write_file(path: str, filename: str, file_content: str):
         else:
             print("Please enter 'yes' or 'no'.")
 
+def search_files(name_pattern : str = '*', min_size : int = None, max_size : int = None, file_type : str = None, modified_within_days : int = None):
+
+    def is_modified_recently(file: Path, days: int) -> bool:
+        last_modified_time = file.stat().st_mtime
+        
+        file_datetime = datetime.fromtimestamp(last_modified_time, tz=timezone.utc)
+        
+        current_datetime = datetime.now(timezone.utc)
+        
+        threshold_datetime = current_datetime - timedelta(days=days)
+        
+        return file_datetime >= threshold_datetime
+
+    criteria = (min_size, max_size, file_type, modified_within_days)
+    
+    if all(v is None for v in criteria) and name_pattern == '*':
+        return {
+            "success" : False,
+            "error" : "no_input",
+            "message" : "You provided no input on what kind of file you were looking for you must provide at least one parameter to find a file"
+            }
+    results = []
+    dir = TESTING_DIR
+    for item in dir.rglob(name_pattern):
+        if item.is_file():
+            if min_size is not None and item.stat().st_size < min_size:
+                continue
+            if max_size is not None and item.stat().st_size > max_size:
+                continue
+            if file_type is not None:
+                normalized_type = f".{file_type.lower().lstrip('.')}"
+                if item.suffix != normalized_type:
+                    continue
+            if modified_within_days is not None and not is_modified_recently(item, modified_within_days):
+                continue
+            results.append(str(item.relative_to(TESTING_DIR)))
+
+    return {
+        "success": True,
+        "count": len(results),
+        "matches": results,
+        "message": "No files matched your search criteria." if not results else f"Found {len(results)} file{'s' if len(results) != 1 else ''}."
+    }
 
 TOOL_REGISTRY = {
     "list_directory": {'function': list_directory, 'mutating': False},
     "read_file": {'function': read_file, 'mutating': False},
-    #"write_file": {'function': write_file, 'mutating': False}
+    #"write_file": {'function': write_file, 'mutating': False},
+    "search_files": {'function': search_files, 'mutating': False},
 }

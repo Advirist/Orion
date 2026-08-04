@@ -1,4 +1,4 @@
-from ollama import chat
+from settings.config import CLIENT
 import json
 from tools import call_tool
 from storage.history import history_load, history_save
@@ -10,6 +10,7 @@ from storage.errors import log_error_from_verifier
 from voice.voice_io import listen, speak
 
 #Loads history from past sessions
+speak_bool = False
 history = history_load()
 
 if isinstance(history, list) and history:
@@ -99,14 +100,15 @@ while session_bool:
             print(f'\n[Verifier flagged this response as inaccurate: {lie_detector_reason}]')
             print(f'[Original response: "{full_content}"]')
             log_error_from_verifier(tool_results_for_lie_detector, full_content, lie_detector_reason)
-            full_content = chat(MODEL_NAME, messages=[{'role' : 'system', 'content' : CORRECTION_PROMPT}])['message']['content']
+            full_content = CLIENT.chat(MODEL_NAME, messages=[{'role' : 'system', 'content' : CORRECTION_PROMPT}])['message']['content']
             print(f'[Corrected response: "{full_content}"]')
 
     tool_results_for_lie_detector = []
 
 
     #prints the response from the model and adds it to the history
-    speak(full_content)
+    if speak_bool:
+        speak(full_content)
     history.append({'role': 'assistant', 'content': full_content})
     history_save(history)
 

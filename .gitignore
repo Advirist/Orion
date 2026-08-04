@@ -9,6 +9,7 @@ verifier_errors.json
 subprocess_errors.json
 tests/
 repl.py
+.env
 
 # C extensions
 *.so

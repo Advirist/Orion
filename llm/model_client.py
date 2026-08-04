@@ -1,10 +1,10 @@
-from ollama import chat
+from settings.config import CLIENT
 from settings.config import MODEL_NAME
 from tools import TOOLS
 
 def get_response(history: str):
     try:
-        stream = chat(MODEL_NAME, messages=history, tools=TOOLS, stream=True)
+        stream = CLIENT.chat(MODEL_NAME, messages=history, tools=TOOLS, stream=True)
 
         full_content = ""
         accumulated_tool_calls = []
