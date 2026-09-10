@@ -10,6 +10,7 @@ subprocess_errors.json
 tests/
 repl.py
 .env
+mic.json
 
 # C extensions
 *.so

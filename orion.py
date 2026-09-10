@@ -107,6 +107,7 @@ while session_bool:
 
 
     #prints the response from the model and adds it to the history
+    #speak(full_content) #will speak no matter what if uncommented
     if speak_bool:
         speak(full_content)
     history.append({'role': 'assistant', 'content': full_content})

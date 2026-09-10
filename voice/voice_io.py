@@ -1,4 +1,4 @@
-from settings.config import PIPER_VOICE_MODEL, MIC_DEVICE
+from settings.config import PIPER_VOICE_MODEL, DEFAULT_MIC_DEVICE
 import sounddevice as sd
 import soundfile as sf
 import numpy as np
@@ -6,6 +6,7 @@ import whisper
 import subprocess
 import tempfile
 import os
+import json
 
 
 # Loaded once, reused across calls — loading Whisper fresh every time would be slow
@@ -18,10 +19,19 @@ def listen(user_in) -> str:
     if user_in.strip():
         return user_in
     print("Recording... press Enter to stop.")
-    
-    mic_dict = sd.query_devices(MIC_DEVICE)
-    mic_name = mic_dict['name']
-    mic_sample_rate = int(mic_dict['default_samplerate'])
+
+    last_mic_name = load_mic_name()
+
+    if last_mic_name:
+
+        mic_name, mic_sample_rate = get_mic(last_mic_name)
+
+    else:
+        mic_name, mic_sample_rate = get_mic(DEFAULT_MIC_DEVICE)
+
+    #mic_dict = sd.query_devices(DEFAULT_MIC_DEVICE)
+    #mic_name = mic_dict['name']
+    #mic_sample_rate = int(mic_dict['default_samplerate'])
     recording = []
     stream = sd.InputStream(samplerate = mic_sample_rate, channels=1, callback=lambda indata, frames, time, status: recording.append(indata.copy()), device = mic_name)
     
@@ -71,3 +81,32 @@ def speak(text: str):
             print(f"[Playback failed: {aplay_result.stderr.decode('utf-8', errors='replace')}]")
     finally:
         os.remove(tmp_path)
+
+#mic defaults to system default unless specified otherwise program will remeber the last mic you used
+def get_mic(chosen_mic): 
+    if  chosen_mic:
+        try:
+            mic_dict = sd.query_devices(chosen_mic)
+            mic_name = mic_dict['name']
+
+            with open('storage/mic.json', 'w') as file:
+                    json.dump({'last_microphone': mic_name}, file, indent = 2)
+
+            return mic_name, int(mic_dict['default_samplerate'])
+        except ValueError:
+            print(f"[Configured mic '{chosen_mic}' not found — falling back to system default.]")
+
+    mic_dict = sd.query_devices(kind='input')
+    mic_name = mic_dict['name']
+
+    with open('storage/mic.json', 'w') as file:
+        json.dump({'last_microphone': mic_name}, file, indent = 2)
+
+    return mic_name, int(mic_dict['default_samplerate'])
+
+def load_mic_name():
+    if os.path.exists('storage/mic.json'):
+        with open('storage/mic.json', "r") as f:
+            data = json.load(f)
+            return data.get('last_microphone')
+    return None
