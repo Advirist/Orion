@@ -1,0 +1,42 @@
+- add a gui
+  - also rust/js?
+- add a wake word
+  - learn/use rust
+- add a text message feature
+- add more tools
+  - filesystem
+    - directory_tree
+    - file_stats
+    - file_diff
+    - find_duplicates
+  - git
+    - git_log
+    - git_diff
+    - git_branch
+    - git_show
+    - git_blame
+    - git_stash_list
+  - system
+    - cpu_memory_status
+    - disk_usage
+    - battery_status
+    - network_status
+    - running_processes
+    - uptime
+  - code inspection
+    - lint_file
+    - list_dependencies
+    - run_tests
+    - todo_scanner
+  - time
+    - current_datetime
+    - reminder_check
+  - media
+    - image_info
+    - pdf_text_extract
+  - weather
+    - weather_check
+
+- claude ai tokens
+- can see images
+  - seperate model needed

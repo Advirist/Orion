@@ -27,4 +27,6 @@ def get_response(history: str):
         return "", []
     except Exception as e:
         print(f"\n[Error communicating with model: {e}]")
+        print("[Cannot reach the model server — check that your desktop is on and Tailscale is connected.]")
+
         return "", []
