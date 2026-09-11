@@ -17,48 +17,53 @@ def listen(user_in) -> str:
 
     #returns string user typed if user chose to use keyboard instead of voice commands
     if user_in.strip():
-        return user_in
-    print("Recording... press Enter to stop.")
+        return user_in, False
 
-    last_mic_name = load_mic_name()
-
-    if last_mic_name:
-
-        mic_name, mic_sample_rate = get_mic(last_mic_name)
-
-    else:
-        mic_name, mic_sample_rate = get_mic(DEFAULT_MIC_DEVICE)
-
-    #mic_dict = sd.query_devices(DEFAULT_MIC_DEVICE)
-    #mic_name = mic_dict['name']
-    #mic_sample_rate = int(mic_dict['default_samplerate'])
-    recording = []
-    stream = sd.InputStream(samplerate = mic_sample_rate, channels=1, callback=lambda indata, frames, time, status: recording.append(indata.copy()), device = mic_name)
-    
-    #starts recording
-    with stream:
-        input()  # blocks here until Enter is pressed again
-    
-    print("Processing...")
-    
-    if not recording:
-        return "User tried to record but nothing came through alert them of this and ask them to type or try recording again"
-    
-    #makes recording into single array
-    audio_data = np.concatenate(recording, axis=0)
-    
-    #creates a temporary .wav file to store audio data in
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-        sf.write(tmp.name, audio_data, mic_sample_rate)
-        tmp_path = tmp.name
-    
-    #converts audio file to dict then returns string
     try:
-        result = _whisper_model.transcribe(tmp_path)
-        return result["text"].strip()
-    #deletes temp file
-    finally:
-        os.remove(tmp_path)
+        print("Recording... press Enter to stop.")
+
+        last_mic_name = load_mic_name()
+
+        if last_mic_name:
+
+            mic_name, mic_sample_rate = get_mic(last_mic_name)
+
+        else:
+            mic_name, mic_sample_rate = get_mic(DEFAULT_MIC_DEVICE)
+
+        #mic_dict = sd.query_devices(DEFAULT_MIC_DEVICE)
+        #mic_name = mic_dict['name']
+        #mic_sample_rate = int(mic_dict['default_samplerate'])
+        recording = []
+        stream = sd.InputStream(samplerate = mic_sample_rate, channels=1, callback=lambda indata, frames, time, status: recording.append(indata.copy()), device = mic_name)
+        
+        #starts recording
+        with stream:
+            input()  # blocks here until Enter is pressed again
+        
+        print("Processing...")
+        
+        if not recording:
+            return "User tried to record but nothing came through alert them of this and ask them to type or try recording again", False
+        
+        #makes recording into single array
+        audio_data = np.concatenate(recording, axis=0)
+        
+        #creates a temporary .wav file to store audio data in
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            sf.write(tmp.name, audio_data, mic_sample_rate)
+            tmp_path = tmp.name
+        
+        #converts audio file to dict then returns string
+        try:
+            result = _whisper_model.transcribe(tmp_path)
+            return result["text"].strip(), True
+        #deletes temp file
+        finally:
+            os.remove(tmp_path)
+    except KeyboardInterrupt:
+        print()
+        return listen(input("Press Enter to start recording, type to not use voice: "))
 
 def speak(text: str):
     """Converts text to speech using Piper and plays it aloud."""

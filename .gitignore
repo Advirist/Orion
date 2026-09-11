@@ -11,6 +11,7 @@ tests/
 repl.py
 .env
 mic.json
+playground/todolist.txt
 
 # C extensions
 *.so

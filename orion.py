@@ -25,7 +25,7 @@ session_bool = True
 try:
     
     user_in = input("Press Enter to start recording, type to not use voice: ")
-    user_in = listen(user_in)
+    user_in, speak_bool = listen(user_in)
 except KeyboardInterrupt:
     print("\n[Exiting]")
     session_bool = False
@@ -107,19 +107,25 @@ while session_bool:
 
 
     #prints the response from the model and adds it to the history
-    #speak(full_content) #will speak no matter what if uncommented
     if speak_bool:
         speak(full_content)
     history.append({'role': 'assistant', 'content': full_content})
     history_save(history)
 
     #asks the user for input and adds it to the history
-    try:
-        user_in = input("Press Enter to start recording, type to not use voice: ")
-        user_in = listen(user_in)
-    except KeyboardInterrupt:
-        print("\n[Exiting]")
-        break
+    if speak_bool:
+        try:
+            user_in, speak_bool = listen('')
+        except KeyboardInterrupt:
+            print("\n[Exiting]")
+            break
+    else:
+        try:
+            user_in = input("Press Enter to start recording, type to not use voice: ")
+            user_in, speak_bool = listen(user_in)
+        except KeyboardInterrupt:
+            print("\n[Exiting]")
+            break
 
     if user_in.strip() == '/e': #ends session if user types /e
         break
