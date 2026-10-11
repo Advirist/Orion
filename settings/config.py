@@ -6,7 +6,8 @@ load_dotenv()
 CLIENT = Client(host=os.getenv("OLLAMA_HOST", "http://localhost:11434"), timeout = 30)
 PROJ_DIR = Path(__file__).parent.parent
 TESTING_DIR = (PROJ_DIR / 'playground').resolve()
-MODEL_NAME = 'qwen2.5:7b'
+MODEL_NAME = 'qwen3:8b'
 VERIFIER_MODEL_NAME = 'qwen3:8b'
 PIPER_VOICE_MODEL = PROJ_DIR / 'voice' / 'models' / 'en_GB-northern_english_male-medium.onnx'
 DEFAULT_MIC_DEVICE = None
+NUM_CTX = 12288

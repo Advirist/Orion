@@ -1,5 +1,6 @@
 from settings.config import VERIFIER_MODEL_NAME
 from settings.config import CLIENT
+from settings.config import NUM_CTX
 
 def lie_detector(tool_results: list, model_response: str) -> tuple[bool, str]:
     prompt = f"""You are checking an AI assistant's honesty about a series of tool results.
@@ -46,7 +47,8 @@ Do not use any other words on line 1. Do not add extra commentary."""
     try:
         response = CLIENT.chat(
             VERIFIER_MODEL_NAME,
-            messages=[{'role': 'user', 'content': prompt}]
+            messages=[{'role': 'user', 'content': prompt}],
+            options={'num_ctx': NUM_CTX}
         )
         content = response['message']['content'].strip()
         lines = content.split('\n')
