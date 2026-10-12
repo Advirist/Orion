@@ -34,7 +34,7 @@ If you ask Orion to write something, it puts the text in its reply for you to co
 
 ### Safety design
 
-- **Sandboxed file access.** File tools only work inside `playground/`. Absolute paths are rejected, `..` tricks are caught by resolving paths before checking containment, and recursive tools skip symlinks.
+- **Sandboxed file access.** File tools only work inside `playground/`. Absolute paths are rejected, `..` tricks are caught by resolving paths before checking containment, and recursive tools skip symlinks. Search patterns match file names only, so a pattern can't reach outside the folder.
 - **No free-form commands.** Git and dependency tools run against fixed locations. Commit references must be `HEAD`, `HEAD~N`, or a hex hash, and file paths are validated and passed after `--`, so the model can't smuggle in git options.
 - **Argument validation.** Unknown or missing arguments return a clear error listing what the tool accepts. They are never silently ignored.
 - **Mutating-tool gate.** Tools flagged as mutating require a typed `yes` before they run. No mutating tools are currently enabled; `write_file` exists in the code but is switched off.
@@ -147,9 +147,21 @@ If the model can't be reached, Orion retries, then exits with a clear message af
 
 ## Roadmap
 
-- A graphical interface
-- A spoken wake word, alongside push-to-talk
-- Trimming or summarizing old history
-- An optional hosted-model backend (the Anthropic API) in place of local Ollama
-- Image understanding through a vision model (`image_info` currently reads metadata only)
-- A way to send messages to and from Orion (design not yet decided)
+**Foundations**
+
+- Pull the conversation loop out of `orion.py` into a reusable engine, so a GUI, a wake word, and a chat bot can all drive the same logic
+- A more thought-through history: separate chats that each keep their own saved history, a way to recall earlier chats, and a plan for chats that grow too long
+- Run Orion as a background service, so the wake word and chat bot work without a terminal open
+
+**Ways to talk to Orion**
+
+- A graphical interface, with a JavaScript front end
+- A spoken wake word alongside push-to-talk, written in C++ (partly as a learning project)
+- Messaging through Telegram or Discord
+- Voice mode that skips code blocks instead of reading them aloud
+- An allow-list for the chat bot, so it only answers your own account
+
+**Models**
+
+- An optional Claude API backend, starting with a limit on tool calls per turn and token and cost logging
+- Image understanding, which needs a vision-capable model (`image_info` only reads metadata today)

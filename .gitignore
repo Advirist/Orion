@@ -12,6 +12,7 @@ repl.py
 .env
 mic.json
 playground/todolist.txt
+ROADMAP.md
 
 # C extensions
 *.so
